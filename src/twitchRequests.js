@@ -9,7 +9,7 @@ let timesToGetToken = 0
 async function getTwitchToken() {
     const idUrlBase = process.env.TWITCH_ID_URL_BASE
 
-    const clientSecret = process.env.TWITCH_CLIENTE_SECRET
+    const clientSecret = process.env.TWITCH_CLIENT_SECRET
 
     console.log("Getting a twitch token!")
 
@@ -68,7 +68,7 @@ async function checkStreamerIsLive() {
 
 }
 
-let isStreaming = () => {
+const isStreaming = () => {
     return isStreamingOn
 }
 

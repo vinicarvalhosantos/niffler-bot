@@ -4,6 +4,7 @@ const tmi = require("tmi.js");
 const onMessage = require("./src/onMessage")
 
 const { checkStreamerIsLive } = require("./src/twitchRequests")
+const { fetchExternalEmotes } = require("./src/bttvFFZRequests")
 
 const cron = require("node-cron");
 
@@ -20,8 +21,13 @@ const configuration = {
 };
 
 checkStreamerIsLive()
+fetchExternalEmotes()
 
 cron.schedule("* * * * *", () => {
+    checkStreamerIsLive()
+})
+
+cron.schedule("* */15 * * *", () => {
     checkStreamerIsLive()
 })
 

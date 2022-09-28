@@ -4,6 +4,7 @@ const { extractContextInformations, sendMessageToAnalyse } = require("./function
 
 const { isStreaming } = require("./twitchRequests")
 
+
 function messageReceived(target, context, message, ehBot) {
 
     if (!isStreaming()) {
@@ -12,6 +13,10 @@ function messageReceived(target, context, message, ehBot) {
     }
 
     if (ehBot) {
+        return;
+    }
+
+    if (message.startsWith("!")) {
         return;
     }
 

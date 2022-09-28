@@ -1,6 +1,8 @@
 require('dotenv/config');
 const axios = require("axios").default;
 
+const { extractExternalEmoteLines, getBttvFfzSevenEmotes, emotesRepeatedInMessage } = require("./bttvFFZRequests")
+
 async function sendMessageToAnalyse(analyseObject) {
 
     const apiUrlBase = process.env.API_URL_BASE
@@ -23,7 +25,7 @@ async function sendMessageToAnalyse(analyseObject) {
 
 }
 
-function extractContextInformations(context, message) {
+async function extractContextInformations(context, message) {
     let subscriptionTime = 0
     let emotes = []
     let emoteOnly = false
@@ -42,18 +44,24 @@ function extractContextInformations(context, message) {
     }
 
     if (context.badges != null && context.badges.subscriber != null) {
-        subscritionTier = Math.floor(context.badges.subscriber / 1000);
+        if (!isNaN(context.badges.subscriber) && context.badges.subscriber >= 1000) {
+            subscritionTier = Math.floor(context.badges.subscriber / 1000);
+        } else {
+            subscritionTier = 1
+        }
     }
 
-    const receivedMessage = message.trim().toLowerCase();
+    const receivedMessage = message.toLowerCase();
     const username = context.username;
     const displayName = context['display-name'];
     const userId = context['user-id'];
 
+    emotes.push(await extractEmotesInMessage(message))
+
     const messageAnalyseObject = {
         displayName: displayName,
         emoteOnly: emoteOnly,
-        emotes: emotes,
+        emotes: emotes.flat(),
         message: receivedMessage,
         subscriber: isSubscriber,
         subscriptionTier: subscritionTier,
@@ -64,6 +72,22 @@ function extractContextInformations(context, message) {
 
     return messageAnalyseObject;
 
+}
+
+function extractEmotesInMessage(message) {
+    let emotesArray = []
+
+    for (emote of getBttvFfzSevenEmotes()) {
+
+        const emotesRepeated = emotesRepeatedInMessage(message, emote.code)
+
+        if (emotesRepeated > 0) {
+            
+            emotesArray.push(extractExternalEmoteLines(emote.id, emote.code, message))
+        }
+    }
+
+    return emotesArray
 }
 
 module.exports = { extractContextInformations, sendMessageToAnalyse }
