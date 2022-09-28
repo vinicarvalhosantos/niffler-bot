@@ -156,30 +156,3 @@ const getBttvFfzSevenEmotes = () => {
 }
 
 module.exports = { extractExternalEmoteLines, fetchExternalEmotes, getBttvFfzSevenEmotes, emotesRepeatedInMessage }
-
-
-
-/*
-let text = "Hello world, welcome to the universe.";
-let test = "Olá, welcome que bom welcome ter voce aqui welcome"
-let message = "welcome";
-
-let testArray = test.split(" ")
-
-let counter = 0;
-for(array of testArray.flat()){
-    if(array == message){
-        counter++
-    }
-}
-
-let arrayListEmotes = []
-
-for(let i = 0; i <= counter; i++){
-    const result = `${test.indexOf(message)}-${test.indexOf(message) + message.length}`;
-    arrayListEmotes.push({id: "dsnufhdu", code:"fgfdgfdhghg", positions: result})
-    const result2 = test.substring(5, message.length + 5)
-    
-}
-
-*/
