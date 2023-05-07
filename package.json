@@ -10,9 +10,15 @@
   "author": "Vinicius \"vcs\" Santos",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1372.0",
+    "aws-sdk-js-codemod": "^0.14.1",
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
+    "i": "^0.3.7",
+    "moment": "^2.29.4",
     "node-cron": "^3.0.2",
+    "node-emoji": "^1.11.0",
+    "npm": "^9.6.6",
     "tmi.js": "^1.8.5"
   }
 }

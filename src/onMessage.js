@@ -1,16 +1,18 @@
 require('dotenv/config');
 
-const { extractContextInformations, sendMessageToAnalyse } = require("./functions")
+const { extractContextInformations, sendMessageToTheQueue } = require("./functions")
 
 const { isStreaming } = require("./twitchRequests")
 
+const dateNow = require("./date")
 
-function messageReceived(target, context, message, ehBot) {
 
-    if (!isStreaming()) {
-        console.log("Streamer is offline!")
+async function messageReceived(target, context, message, ehBot) {
+
+    /*if (!isStreaming()) {
+        //console.log(`${dateNow} - Streamer is offline!`)
         return;
-    }
+    }*/
 
     if (ehBot) {
         return;
@@ -20,9 +22,9 @@ function messageReceived(target, context, message, ehBot) {
         return;
     }
 
-    const messageToAnalyseObject = extractContextInformations(context, message)
+    const messageToAnalyseObject = await extractContextInformations(context, message)
 
-    sendMessageToAnalyse(messageToAnalyseObject)
+    sendMessageToTheQueue(messageToAnalyseObject)
 }
 
 module.exports = messageReceived;

@@ -1,5 +1,7 @@
 const { default: axios } = require("axios")
 
+const dateNow = require("./date.js")
+
 
 let twitchToken = ""
 let isStreamingOn = false
@@ -11,19 +13,19 @@ async function getTwitchToken() {
 
     const clientSecret = process.env.TWITCH_CLIENT_SECRET
 
-    console.log("Getting a twitch token!")
+    console.log(`${dateNow} - Getting a twitch token!`)
 
     await axios.post(`${idUrlBase}/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`).then(response => {
 
         if (response.status === 200) {
 
             twitchToken = response.data.access_token
-            console.info("Twitch token successfully got!")
+            console.info(`${dateNow} - Twitch token successfully got!`)
             timesToGetToken = 0
 
         }
     }).catch(err => {
-        console.error(`Was not possible to get a twitch token!\n ${err}`)
+        console.error(`${dateNow()} - Was not possible to get a twitch token!\n ${err}`)
     })
 }
 
@@ -43,7 +45,7 @@ async function checkStreamerIsLive() {
         }
     }
 
-    console.info("Checking if streamer is online!")
+    console.info(`${dateNow} - Checking if streamer is online!`)
 
     await axios.get(`${apiUrlBase}/streams?user_id=${userId}`, config).then(response => {
 
@@ -64,7 +66,7 @@ async function checkStreamerIsLive() {
         }
     })
 
-    console.info(`Streamer is ${isStreaming() ? "online" : "offline"}!`)
+    console.info(`${dateNow} - Streamer is ${isStreaming() ? "online" : "offline"}!`)
 
 }
 

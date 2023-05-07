@@ -1,8 +1,21 @@
 require('dotenv/config');
 const axios = require("axios").default;
+const AWS = require("aws-sdk")
+const dateNow = require("./date")
+const emoji = require("node-emoji")
+
+AWS.config.update({ region: "sa-east-1" })
+AWS.config.update({ credentials: { accessKeyId: process.env.AWS__ACCESS_KEY, secretAccessKey: process.env.AWS__SECRET_KEY } })
+
+const sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
 
 const { extractExternalEmoteLines, getBttvFfzSevenEmotes, emotesRepeatedInMessage } = require("./bttvFFZRequests")
 
+
+/**
+ * @deprecated
+ * @param {*} analyseObject 
+ */
 async function sendMessageToAnalyse(analyseObject) {
 
     const apiUrlBase = process.env.API_URL_BASE
@@ -13,16 +26,33 @@ async function sendMessageToAnalyse(analyseObject) {
         }
     }
 
-    await axios.post(`${apiUrlBase}/v1/user-message/analyse`, analyseObject, config).then(response => {
+    await axios.post(`${apiUrlBase}/v2/user-message/analyse`, analyseObject, config).then(response => {
 
         if (response.status === 200) {
-            console.info(`Sent ${analyseObject.displayName}'s message to analyse!`)
+            console.info(`${dateNow()} - Sent ${analyseObject.displayName}'s message to analyse!`)
         }
 
     }).catch((e) => {
-        console.error(`An error ocurred \n${e}`);
+        console.error(`${dateNow} - An error ocurred -- \n${e}`);
     })
 
+}
+
+async function sendMessageToTheQueue(analyseObject) {
+    const message = {
+        MessageBody: JSON.stringify(analyseObject),
+        MessageDeduplicationId: `user-message-analyse-${analyseObject.userId}-${new Date().getMilliseconds()}`,
+        MessageGroupId: "USER-MESSAGE-ANALYSE",
+        QueueUrl: process.env.SQS_URL
+    }
+
+    sqs.sendMessage(message, function (err, data) {
+        if (err) {
+            console.log(`${dateNow} - An error occurred when tried to send the user message to the queue. Error: \n`, err)
+        } else {
+            console.log(`${dateNow} - User message sent to the queue!`, `(MessageId: ${data.MessageId})`)
+        }
+    })
 }
 
 async function extractContextInformations(context, message) {
@@ -51,7 +81,7 @@ async function extractContextInformations(context, message) {
         }
     }
 
-    const receivedMessage = message.toLowerCase();
+    const receivedMessage = emoji.replace(message.toLowerCase(), () => `.`)
     const username = context.username;
     const displayName = context['display-name'];
     const userId = context['user-id'];
@@ -67,7 +97,7 @@ async function extractContextInformations(context, message) {
         subscriptionTier: subscritionTier,
         subscriptionTime: parseInt(subscriptionTime),
         userId: parseInt(userId),
-        username: username
+        username: username,
     }
 
     return messageAnalyseObject;
@@ -82,7 +112,7 @@ function extractEmotesInMessage(message) {
         const emotesRepeated = emotesRepeatedInMessage(message, emote.code)
 
         if (emotesRepeated > 0) {
-            
+
             emotesArray.push(extractExternalEmoteLines(emote.id, emote.code, message))
         }
     }
@@ -90,4 +120,5 @@ function extractEmotesInMessage(message) {
     return emotesArray
 }
 
-module.exports = { extractContextInformations, sendMessageToAnalyse }
+
+module.exports = { extractContextInformations, sendMessageToAnalyse, sendMessageToTheQueue }

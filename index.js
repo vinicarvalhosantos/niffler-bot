@@ -23,11 +23,15 @@ const configuration = {
 checkStreamerIsLive()
 fetchExternalEmotes()
 
-cron.schedule("* * * * *", () => {
-    checkStreamerIsLive()
+cron.schedule("* */15 * * *", () => {
+    fetchExternalEmotes()
 })
 
 cron.schedule("* */15 * * *", () => {
+    checkStreamerIsLive()
+})
+
+cron.schedule("* */30 * * *", () => {
     checkStreamerIsLive()
 })
 

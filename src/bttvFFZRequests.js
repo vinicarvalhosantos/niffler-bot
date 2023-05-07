@@ -1,4 +1,5 @@
 const { default: axios } = require("axios");
+const dateNow = require("./date")
 
 let bttvFFZSevenEmotes = [];
 const broadcasterId = process.env.TWITCH_USER_ID;
@@ -7,7 +8,7 @@ const sevenTvApiUrlBase = process.env.SEVENTV_API_URL_BASE;
 
 async function fetchExternalEmotes() {
 
-    console.info("Fetching BTTV, FFZ and 7TV emotes!")
+    console.info(`${dateNow} - Fetching BTTV, FFZ and 7TV emotes!`)
 
     await axios.get(`${apiUrlBase}/emotes/global`).then(resp => {
         if (resp.status === 200) {
@@ -23,7 +24,7 @@ async function fetchExternalEmotes() {
 
         }
     }).catch(err => {
-        console.error(`An error occurred when tried to fetch the BTTV Global emotes!\n${err}`)
+        console.error(`${dateNow} - An error occurred when tried to fetch the BTTV Global emotes!\n${err}`)
     })
 
     await axios.get(`${apiUrlBase}/users/twitch/${broadcasterId}`).then(resp => {
@@ -48,7 +49,7 @@ async function fetchExternalEmotes() {
 
         }
     }).catch(err => {
-        console.error(`An error occurred when tried to fetch the BTTV Channel emotes!\n${err}`)
+        console.error(`${dateNow} - An error occurred when tried to fetch the BTTV Channel emotes!\n${err}`)
     })
 
     await axios.get(`${apiUrlBase}/frankerfacez/users/twitch/${broadcasterId}`).then(resp => {
@@ -65,7 +66,7 @@ async function fetchExternalEmotes() {
 
         }
     }).catch(err => {
-        console.error(`An error occurred when tried to fetch the FFZ Channel emotes!\n${err}`)
+        console.error(`${dateNow} - An error occurred when tried to fetch the FFZ Channel emotes!\n${err}`)
     })
 
     await axios.get(`${sevenTvApiUrlBase}/emotes/global`).then(resp => {
@@ -82,7 +83,7 @@ async function fetchExternalEmotes() {
 
         }
     }).catch(err => {
-        console.error(`An error occurred when tried to fetch the 7TV Global emotes!\n${err}`)
+        console.error(`${dateNow} - An error occurred when tried to fetch the 7TV Global emotes!\n${err}`)
     })
 
     await axios.get(`${sevenTvApiUrlBase}/users/${broadcasterId}/emotes`).then(resp => {
@@ -99,13 +100,15 @@ async function fetchExternalEmotes() {
 
         }
     }).catch(err => {
-        if (err.status !== 404) {
-            console.error(`An error occurred when tried to fetch the 7TV Global emotes!\n${err}`)
+        if (err.response == undefined) {
+            console.error(`${dateNow} - An error occured when tired to fetch the 7TV Channel emotes and was no possible to track the error!`)
+        } else if (err.response.status != 404) {
+            console.error(`${dateNow} - An error occurred when tried to fetch the 7TV Channel emotes!\n${err}`)
         }
     })
 
 
-    console.info("Finished fetching BTTV, FFZ and 7TV emotes!")
+    console.info(`${dateNow} - Finished fetching BTTV, FFZ and 7TV emotes!`)
 
 }
 
@@ -117,7 +120,7 @@ function extractExternalEmoteLines(emoteId, emoteMessage, message) {
 
     for (let i = 1; i <= emotesInMessage; i++) {
         const firstPosition = fromIndex(message, emoteMessage, i)
-        const secondPostion = firstPosition + emoteMessage.length
+        const secondPostion = (firstPosition + (emoteMessage.length - 1))
         if (i !== 1) {
             result += `,${firstPosition}-${secondPostion}`;
         } else {
